@@ -1,0 +1,25 @@
+/*  Overview:
+The assembly logic for managing function selectors might incorrectly add or remove selectors, causing unintended behavior.
+
+Actors:
+Attacker: Exploits the logical error to disrupt governance.
+Victim: The protocol users and governance structure.
+Protocol: Beanstalk’s governance system.      */ 
+
+
+
+pragma solidity ^0.8.0;
+
+import "./HypernativeModule.sol";
+import "./IDiamondLoupe.sol";
+
+contract HypernativeModuleTest is HypernativeModule {
+    constructor() HypernativeModule(address(0x0), address(0x0), msg.sender) {}
+
+    function testRemoveAllFunctions() public {
+        removeAllBeanstalkFunctions();
+        // Check if unintended functions are still available or removed
+        IDiamondLoupe.Facet[] memory facets = IDiamondLoupe(protectedContractAddress).facets();
+        require(facets.length == 0, "Not all functions were removed correctly");
+    }
+}
